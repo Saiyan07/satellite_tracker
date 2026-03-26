@@ -4,7 +4,7 @@ import time
 import folium
 from streamlit_folium import st_folium
 import math
-import datetime
+from datetime import datetime
 import pytz
 
 # Page configuration
