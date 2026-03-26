@@ -84,7 +84,7 @@ while True:
             with col2:
                 st.metric("📍 Path Points", len(st.session_state.path))
             with col3:
-                st.metric("Last Updated", current_time().strftime("%H:%M:%S"))
+                st.metric("Last Updated", current_time.strftime("%H:%M:%S"))
 
             # Try to detect current country/ocean
             try:
