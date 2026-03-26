@@ -49,12 +49,16 @@ while True:
             if len(st.session_state.path) > 120:   # Keep last ~10 minutes
                 st.session_state.path.pop(0)
 
-            # ================== IMPROVED SPEED CALCULATION ==================
+                        # ================== IMPROVED SPEED CALCULATION ==================
             speed_kmh = 27600.0  # Default approximate orbital speed
 
+            ist = pytz.timezone('Asia/Kolkata')
+            now_ist = datetime.now(ist)                    # Keep as datetime object
+            current_time_str = now_ist.strftime('%H:%M:%S')  # Only convert once
+
             if len(st.session_state.path) >= 5:
-                recent_points = st.session_state.path[-10:]  # Use last 10 points for stability
-                
+                recent_points = st.session_state.path[-10:]
+
                 total_distance = 0.0
                 for i in range(1, len(recent_points)):
                     dist = haversine(
@@ -62,18 +66,12 @@ while True:
                         recent_points[i][0], recent_points[i][1]
                     )
                     total_distance += dist
-                
-                # Time passed in seconds = 5 seconds × number of intervals
+
                 seconds_passed = 5 * (len(recent_points) - 1)
-                calculated_speed = (total_distance / seconds_passed) * 3600  # km/h
-                
-                # Use calculated speed only if it looks realistic
+                calculated_speed = (total_distance / seconds_passed) * 3600
+
                 if 20000 < calculated_speed < 32000:
                     speed_kmh = calculated_speed
-                    
-
-                ist = pytz.timezone('Asia/Kolkata')
-                current_time = datetime.now(ist).strftime('%H:%M:%S')
 
             # ================== UI ==================
             st.success(f"**Current ISS Position:** {lat:.4f}° N, {lon:.4f}° E")
@@ -84,7 +82,7 @@ while True:
             with col2:
                 st.metric("📍 Path Points", len(st.session_state.path))
             with col3:
-                st.metric("Last Updated", current_time.strftime("%H:%M:%S"))
+                st.metric("Last Updated", current_time_str)  
 
             # Try to detect current country/ocean
             try:
