@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import time
-from datetime import datetime
 import folium
 from streamlit_folium import st_folium
 import math
