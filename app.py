@@ -5,6 +5,8 @@ from datetime import datetime
 import folium
 from streamlit_folium import st_folium
 import math
+import datetime
+import pytz
 
 # Page configuration
 st.set_page_config(
@@ -69,6 +71,10 @@ while True:
                 # Use calculated speed only if it looks realistic
                 if 20000 < calculated_speed < 32000:
                     speed_kmh = calculated_speed
+                    
+
+                ist = pytz.timezone('Asia/Kolkata')
+                current_time = datetime.now(ist).strftime('%H:%M:%S')
 
             # ================== UI ==================
             st.success(f"**Current ISS Position:** {lat:.4f}° N, {lon:.4f}° E")
@@ -79,7 +85,7 @@ while True:
             with col2:
                 st.metric("📍 Path Points", len(st.session_state.path))
             with col3:
-                st.metric("Last Updated", datetime.now().strftime("%H:%M:%S"))
+                st.metric("Last Updated", current_time().strftime("%H:%M:%S"))
 
             # Try to detect current country/ocean
             try:
