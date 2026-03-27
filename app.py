@@ -35,7 +35,7 @@ placeholder = st.empty()
 
 while True:
     with placeholder.container():
-                try:
+         try:
             # Fetch live ISS position
             response = requests.get("http://api.open-notify.org/iss-now.json", timeout=10)
             response.raise_for_status()
