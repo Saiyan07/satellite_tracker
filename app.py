@@ -35,7 +35,7 @@ placeholder = st.empty()
 
 while True:
     with placeholder.container():
-        try:
+                try:
             # Fetch live ISS position
             response = requests.get("http://api.open-notify.org/iss-now.json", timeout=10)
             response.raise_for_status()
@@ -46,12 +46,11 @@ while True:
 
             # Update path
             st.session_state.path.append([lat, lon])
-            if len(st.session_state.path) > 120:   # Keep last ~10 minutes
+            if len(st.session_state.path) > 120: 
                 st.session_state.path.pop(0)
 
-                        # ================== IMPROVED SPEED CALCULATION ==================
-            # Store: (lat, lon, timestamp)
-           speed_kmh = 27600.0  # Default approximate orbital speed
+            # ================== IMPROVED SPEED CALCULATION ==================
+            speed_kmh = 27600.0  # Default approximate orbital speed
 
             ist = pytz.timezone('Asia/Kolkata')
             now_ist = datetime.now(ist)
@@ -82,9 +81,9 @@ while True:
             with col2:
                 st.metric("📍 Path Points", len(st.session_state.path))
             with col3:
-                st.metric("Last Updated", current_time_str)  
+                st.metric("Last Updated", current_time_str)
 
-            # Try to detect current country/ocean
+            # Country detection
             try:
                 geo_url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json"
                 geo_res = requests.get(geo_url, headers={"User-Agent": "ISS-Tracker-Saiyam"}, timeout=5)
@@ -92,13 +91,14 @@ while True:
                     address = geo_res.json().get("address", {})
                     country = address.get("country", "Ocean / Remote Area")
                     st.info(f"🌍 Currently over: **{country}**")
+                else:
+                    st.info("🌍 Currently over: **Ocean / Remote Area**")
             except:
                 st.info("🌍 Currently over: **Ocean / Remote Area**")
 
             # ================== Create Map ==================
             m = folium.Map(location=[lat, lon], zoom_start=3, tiles="CartoDB positron")
 
-            # Draw blue path trail
             if len(st.session_state.path) > 1:
                 folium.PolyLine(
                     st.session_state.path,
@@ -107,12 +107,12 @@ while True:
                     opacity=0.85
                 ).add_to(m)
 
-            # ISS Marker with rich popup
+            # ISS Marker
             popup_html = f"""
             <b>ISS Satellite 🚀</b><br>
             Latitude: {lat:.4f}° N<br>
             Longitude: {lon:.4f}° E<br>
-            Time: {datetime.now().strftime('%H:%M:%S')}<br>
+            Time (IST): {now_ist.strftime('%H:%M:%S')}<br>
             Speed: ~{speed_kmh:,.0f} km/h
             """
             folium.Marker(
@@ -123,13 +123,8 @@ while True:
 
             # Display map
             st_folium(m, use_container_width=True, height=650, returned_objects=[])
-
             st.caption("🔄 Auto-refreshes every 5 seconds • Data from Open Notify API")
 
         except Exception as e:
             st.error(f"⚠️ Error fetching ISS data: {e}")
             st.info("Retrying in 5 seconds...")
-
-    # Auto-refresh every 5 seconds
-    time.sleep(5)
-    st.rerun()
