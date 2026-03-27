@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import time
 import folium
 from streamlit_folium import st_folium
 import math
@@ -35,7 +34,7 @@ placeholder = st.empty()
 
 while True:
     with placeholder.container():
-         try:
+        try:
             # Fetch live ISS position
             response = requests.get("http://api.open-notify.org/iss-now.json", timeout=10)
             response.raise_for_status()
@@ -46,7 +45,7 @@ while True:
 
             # Update path
             st.session_state.path.append([lat, lon])
-            if len(st.session_state.path) > 120: 
+            if len(st.session_state.path) > 120:
                 st.session_state.path.pop(0)
 
             # ================== IMPROVED SPEED CALCULATION ==================
@@ -65,10 +64,10 @@ while True:
                         recent_points[i][0], recent_points[i][1]
                     )
                     total_distance += dist
-                
+
                 seconds_passed = 5 * (len(recent_points) - 1)
                 calculated_speed = (total_distance / seconds_passed) * 3600
-                
+
                 if 22000 < calculated_speed < 30000:
                     speed_kmh = calculated_speed
 
@@ -93,7 +92,7 @@ while True:
                     st.info(f"🌍 Currently over: **{country}**")
                 else:
                     st.info("🌍 Currently over: **Ocean / Remote Area**")
-            except:
+            except requests.RequestException:
                 st.info("🌍 Currently over: **Ocean / Remote Area**")
 
             # ================== Create Map ==================
