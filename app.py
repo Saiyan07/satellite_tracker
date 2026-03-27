@@ -48,28 +48,35 @@ while True:
             if len(st.session_state.path) > 120:
                 st.session_state.path.pop(0)
 
-            # ================== IMPROVED SPEED CALCULATION ==================
-            speed_kmh = 27600.0  # Default approximate orbital speed
+                        # ================== IMPROVED SPEED CALCULATION ==================
+            speed_kmh = 27600.0  # Default approximate orbital speed (fallback)
 
             ist = pytz.timezone('Asia/Kolkata')
             now_ist = datetime.now(ist)
             current_time_str = now_ist.strftime('%H:%M:%S')
 
+            # Calculate speed only when we have enough points
             if len(st.session_state.path) >= 5:
-                recent_points = st.session_state.path[-10:]
+                recent_points = st.session_state.path[-10:]   # Use last 10 points for stability
+                
                 total_distance = 0.0
                 for i in range(1, len(recent_points)):
                     dist = haversine(
                         recent_points[i-1][0], recent_points[i-1][1],
-                        recent_points[i][0], recent_points[i][1]
+                        recent_points[i][0],   recent_points[i][1]
                     )
                     total_distance += dist
 
+                # Time passed: 5 seconds per interval
                 seconds_passed = 5 * (len(recent_points) - 1)
-                calculated_speed = (total_distance / seconds_passed) * 3600
-
-                if 22000 < calculated_speed < 30000:
-                    speed_kmh = calculated_speed
+                
+                if seconds_passed > 0:
+                    calculated_speed = (total_distance / seconds_passed) * 3600
+                    
+                    # Accept calculated speed only if it's realistic (ISS orbital speed range)
+                    if 24000 < calculated_speed < 31000:
+                        speed_kmh = calculated_speed
+                    # Else keep the default 27600
 
             # ================== UI ==================
             st.success(f"**Current ISS Position:** {lat:.4f}° N, {lon:.4f}° E")
