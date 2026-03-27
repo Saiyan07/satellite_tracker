@@ -51,34 +51,34 @@ while True:
 
                         # ================== IMPROVED SPEED CALCULATION ==================
             # Store: (lat, lon, timestamp)
-now = datetime.utcnow()
+            now = datetime.utcnow()
 
-st.session_state.path.append((latitude, longitude, now))
+            st.session_state.path.append((latitude, longitude, now))
 
-speed_kmh = 27600.0  # fallback
+            speed_kmh = 27600.0  # fallback
 
-if len(st.session_state.path) >= 5:
-    recent_points = st.session_state.path[-10:]
+            if len(st.session_state.path) >= 5:
+                 recent_points = st.session_state.path[-10:]
 
-    total_distance = 0.0
-    total_time = 0.0
+                 total_distance = 0.0
+                 total_time = 0.0
 
-    for i in range(1, len(recent_points)):
-        lat1, lon1, t1 = recent_points[i-1]
-        lat2, lon2, t2 = recent_points[i]
+                 for i in range(1, len(recent_points)):
+                 lat1, lon1, t1 = recent_points[i-1]
+                 lat2, lon2, t2 = recent_points[i]
 
-        dist = haversine(lat1, lon1, lat2, lon2)
-        time_diff = (t2 - t1).total_seconds()
+                 dist = haversine(lat1, lon1, lat2, lon2)
+                 time_diff = (t2 - t1).total_seconds()
 
-        if time_diff > 0:
-            total_distance += dist
-            total_time += time_diff
+                 if time_diff > 0:
+                     total_distance += dist
+                     total_time += time_diff
 
-    if total_time > 0:
-        calculated_speed = (total_distance / total_time) * 3600
+                 if total_time > 0:
+                     calculated_speed = (total_distance / total_time) * 3600
 
-        if 22000 < calculated_speed < 30000:
-            speed_kmh = calculated_speed
+                 if 22000 < calculated_speed < 30000:
+                    speed_kmh = calculated_speed
 
             # ================== UI ==================
             st.success(f"**Current ISS Position:** {lat:.4f}° N, {lon:.4f}° E")
