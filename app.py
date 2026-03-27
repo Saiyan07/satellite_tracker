@@ -64,8 +64,8 @@ while True:
                  total_time = 0.0
 
                  for i in range(1, len(recent_points)):
-                 lat1, lon1, t1 = recent_points[i-1]
-                 lat2, lon2, t2 = recent_points[i]
+                     lat1, lon1, t1 = recent_points[i-1]
+                     lat2, lon2, t2 = recent_points[i]
 
                  dist = haversine(lat1, lon1, lat2, lon2)
                  time_diff = (t2 - t1).total_seconds()
