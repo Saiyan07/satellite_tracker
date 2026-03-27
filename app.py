@@ -50,28 +50,35 @@ while True:
                 st.session_state.path.pop(0)
 
                         # ================== IMPROVED SPEED CALCULATION ==================
-            speed_kmh = 27600.0  # Default approximate orbital speed
+            # Store: (lat, lon, timestamp)
+now = datetime.utcnow()
 
-            ist = pytz.timezone('Asia/Kolkata')
-            now_ist = datetime.now(ist)                    # Keep as datetime object
-            current_time_str = now_ist.strftime('%H:%M:%S')  # Only convert once
+st.session_state.path.append((latitude, longitude, now))
 
-            if len(st.session_state.path) >= 5:
-                recent_points = st.session_state.path[-10:]
+speed_kmh = 27600.0  # fallback
 
-                total_distance = 0.0
-                for i in range(1, len(recent_points)):
-                    dist = haversine(
-                        recent_points[i-1][0], recent_points[i-1][1],
-                        recent_points[i][0], recent_points[i][1]
-                    )
-                    total_distance += dist
+if len(st.session_state.path) >= 5:
+    recent_points = st.session_state.path[-10:]
 
-                seconds_passed = 5 * (len(recent_points) - 1)
-                calculated_speed = (total_distance / seconds_passed) * 3600
+    total_distance = 0.0
+    total_time = 0.0
 
-                if 20000 < calculated_speed < 32000:
-                    speed_kmh = calculated_speed
+    for i in range(1, len(recent_points)):
+        lat1, lon1, t1 = recent_points[i-1]
+        lat2, lon2, t2 = recent_points[i]
+
+        dist = haversine(lat1, lon1, lat2, lon2)
+        time_diff = (t2 - t1).total_seconds()
+
+        if time_diff > 0:
+            total_distance += dist
+            total_time += time_diff
+
+    if total_time > 0:
+        calculated_speed = (total_distance / total_time) * 3600
+
+        if 22000 < calculated_speed < 30000:
+            speed_kmh = calculated_speed
 
             # ================== UI ==================
             st.success(f"**Current ISS Position:** {lat:.4f}° N, {lon:.4f}° E")
